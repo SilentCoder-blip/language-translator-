@@ -1,12 +1,19 @@
 import streamlit as st
-from deep_translator import GoogleTranslator
+from transformers import pipeline
 from gtts import gTTS
 import tempfile
 
-# Translation Function
+# Load the translation pipeline from Hugging Face
+translator = pipeline("translation", model="Helsinki-NLP/opus-mt-en-hi")
+
+# Translation Function Using Hugging Face Pipeline
 def translate_text(text, src_lang, dest_lang):
-    translator = GoogleTranslator(source=src_lang, target=dest_lang)
-    return translator.translate(text)
+    # Here we only support "en" to "hi" for demonstration; expand with more models for additional languages
+    if src_lang == "en" and dest_lang == "hi":
+        translated_text = translator(text, src_lang=src_lang, tgt_lang=dest_lang)
+        return translated_text[0]['translation_text']
+    else:
+        return "Currently, only English to Hindi translation is supported in this example."
 
 # Text-to-Speech Function
 def text_to_speech(text, lang):
@@ -18,26 +25,25 @@ def text_to_speech(text, lang):
 # Streamlit Interface
 def main():
     st.title("Multilingual Translator and TTS")
-    
+
     # Language Options
     languages = {
-        'English': 'en', 'Hindi': 'hi', 'Bengali': 'bn', 'Tamil': 'ta',
-        'Telugu': 'te', 'Marathi': 'mr', 'Kannada': 'kn', 'Gujarati': 'gu',
-        'Malayalam': 'ml', 'Punjabi': 'pa'
+        'English': 'en',
+        'Hindi': 'hi'
     }
-    
+
     # Language Selection
     src_lang = st.selectbox("Select Input Language", list(languages.keys()))
     dest_lang = st.selectbox("Select Output Language", list(languages.keys()))
-    
+
     # Input Text
     text = st.text_area("Enter Text to Translate")
-    
+
     # Translation and Display
     if st.button("Translate"):
         translated_text = translate_text(text, languages[src_lang], languages[dest_lang])
         st.write("Translated Text:", translated_text)
-        
+
         # TTS and Playback
         if st.button("Play Translation"):
             audio_file = text_to_speech(translated_text, languages[dest_lang])
