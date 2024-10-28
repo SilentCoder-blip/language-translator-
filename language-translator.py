@@ -1,13 +1,12 @@
 import streamlit as st
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 from gtts import gTTS
 import tempfile
 
 # Translation Function
 def translate_text(text, src_lang, dest_lang):
-    translator = Translator()
-    translation = translator.translate(text, src=src_lang, dest=dest_lang)
-    return translation.text
+    translator = GoogleTranslator(source=src_lang, target=dest_lang)
+    return translator.translate(text)
 
 # Text-to-Speech Function
 def text_to_speech(text, lang):
